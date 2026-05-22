@@ -104,6 +104,23 @@ ait decode s4x9
 # >SEC:XSS #ctx4 !9
 ```
 
+Decode AIT/EAP to Japanese without any LLM:
+
+```bash
+ait decode-ja s4x9
+# コンテキスト4に対して、セキュリティ領域のXSS検証を実行します。優先度は最高です。
+```
+
+Build EAP/AIT directly from UI-style parameters:
+
+```bash
+ait build-eap --domain security --action xss --target 4 --priority 9
+# >SEC:XSS #ctx4 !9
+
+ait build-ait --domain security --action xss --target 4 --priority 9
+# s4x9
+```
+
 Measure compactness:
 
 ```bash
@@ -123,7 +140,10 @@ Like machine code, compactness comes from prior agreement.
 
 For debug logs, use EAP. For compact transport, use AIT.
 
+AIT intentionally does not call LLM APIs for encode/decode. Human-readable
+Japanese logs are produced by static Python dictionaries, and command encoding
+is built from structured parameters rather than free-form natural language.
+
 ## License
 
 MIT
-
