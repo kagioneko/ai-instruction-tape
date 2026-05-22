@@ -133,6 +133,23 @@ Check dictionary ambiguity:
 ait check
 ```
 
+## Multi-Agent Tape Example
+
+Parent agents can instruct child agents with four-character AIT packets. No LLM
+is needed for routing, decoding, or logging.
+
+```bash
+python examples/multi_agent_tape.py
+```
+
+Example output:
+
+```text
+parent -> security-child: s4x9
+log: コンテキスト4に対して、セキュリティ領域のXSS検証を実行します。優先度は最高です。
+result: {'ok': True, 'target': '#ctx4', 'vulnerable': True, 'finding': 'script_tag_detected'}
+```
+
 ## Design Notes
 
 AIT only works if both sides share the dictionary. This is a feature, not a bug.
