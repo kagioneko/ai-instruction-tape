@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 
 from .codec import build_ait, build_eap, decode_to_japanese
 from .core import decode_ait, encode_eap
 from .dictionary import default_dictionary
-from .meter import compare_forms, measure_text
+from .learner import Learner, ValidationError, validate_ait
+from .meter import compare_forms, estimate_tokens, measure_text
 
 
 def main() -> None:
@@ -38,6 +40,46 @@ def main() -> None:
     raw_meter_cmd.add_argument("--label", default="text")
 
     subparsers.add_parser("check", help="Check default dictionary ambiguity.")
+
+    # ── auto: lookup or LLM-generate ─────────────────────────────────────────
+    auto_cmd = subparsers.add_parser(
+        "auto",
+        help="Look up or auto-generate AIT for a natural-language instruction.",
+    )
+    auto_cmd.add_argument("natural", help="Natural-language instruction to encode.")
+    auto_cmd.add_argument(
+        "--claude-bin", default="claude", metavar="PATH",
+        help="Path to the Claude CLI binary (default: 'claude').",
+    )
+    auto_cmd.add_argument(
+        "--json", action="store_true", dest="as_json",
+        help="Output full entry as JSON.",
+    )
+
+    # ── learn: manual registration ────────────────────────────────────────────
+    learn_cmd = subparsers.add_parser(
+        "learn",
+        help="Manually register a natural → AIT mapping.",
+    )
+    learn_cmd.add_argument("natural", help="Natural-language instruction.")
+    learn_cmd.add_argument("ait_code", metavar="ait", help="AIT code to register.")
+
+    # ── stats: ROI summary ────────────────────────────────────────────────────
+    stats_cmd = subparsers.add_parser(
+        "stats",
+        help="Show learned dictionary statistics and ROI.",
+    )
+    stats_cmd.add_argument(
+        "--list", action="store_true", dest="list_entries",
+        help="Also list all learned entries.",
+    )
+
+    # ── validate: standalone code check ──────────────────────────────────────
+    validate_cmd = subparsers.add_parser(
+        "validate",
+        help="Validate an AIT code without registering it.",
+    )
+    validate_cmd.add_argument("ait_code", metavar="ait", help="AIT code to validate.")
 
     args = parser.parse_args()
 
@@ -77,6 +119,79 @@ def main() -> None:
             print(json.dumps(errors, ensure_ascii=False, indent=2))
             raise SystemExit(1)
         print("ok")
+
+    elif args.command == "auto":
+        learner = Learner()
+        try:
+            code, was_hit = learner.auto(args.natural, claude_bin=args.claude_bin)
+        except ValidationError as exc:
+            print(f"[error] {exc}", file=sys.stderr)
+            raise SystemExit(1)
+        except RuntimeError as exc:
+            print(f"[error] LLM call failed: {exc}", file=sys.stderr)
+            raise SystemExit(1)
+
+        if args.as_json:
+            entry = learner._data.get(args.natural.strip())
+            out = {
+                "ait": code,
+                "cache_hit": was_hit,
+                **(entry.to_dict() if entry else {}),
+            }
+            print(json.dumps(out, ensure_ascii=False, indent=2))
+        else:
+            label = "cache hit ✅" if was_hit else "generated + registered 🆕"
+            print(f"{code}  [{label}]")
+
+    elif args.command == "learn":
+        learner = Learner()
+        nat_tokens = estimate_tokens(args.natural.strip())
+        try:
+            entry = learner.learn(
+                args.natural,
+                args.ait_code,
+                source="manual",
+                natural_tokens=nat_tokens,
+            )
+        except ValidationError as exc:
+            print(f"[error] {exc}", file=sys.stderr)
+            raise SystemExit(1)
+        print(f"✅ registered: {args.natural!r} → {entry.ait}  (eap: {entry.eap})")
+        if entry.tokens_per_hit > 0:
+            print(f"   saves {entry.tokens_per_hit} tokens/hit  |  payline: {entry.payline} hits")
+
+    elif args.command == "stats":
+        learner = Learner()
+        s = learner.stats()
+        print("=== AIT Learned Dictionary Stats ===")
+        print(f"  Entries       : {s['entries']}")
+        print(f"  Total hits    : {s['total_hits']}")
+        print(f"  Tokens saved  : {s['total_tokens_saved']:,}")
+        print(f"  Paid off      : {s['entries_paid_off']} ✅  /  pending: {s['entries_pending']} 📈")
+        if args.list_entries:
+            print()
+            entries = learner.list_entries()
+            if not entries:
+                print("  (no entries yet)")
+            else:
+                for e in entries:
+                    print(
+                        f"  {e['ait']}  {e['roi_status']:12s} hits={e['hits']:3d}"
+                        f"  save={e['tokens_per_hit']}tok/hit"
+                        f"  [{e['source']}]  {e['natural'][:60]}"
+                    )
+
+    elif args.command == "validate":
+        try:
+            code = validate_ait(args.ait_code)
+            from .core import decode_ait as _decode
+            packet = _decode(code)
+            print(f"✅ valid: {code}")
+            print(f"   domain={packet.domain}  target={packet.target}"
+                  f"  action={packet.action}  priority={packet.priority}")
+        except ValidationError as exc:
+            print(f"❌ invalid: {exc}", file=sys.stderr)
+            raise SystemExit(1)
 
 
 def _add_build_args(command: argparse.ArgumentParser) -> None:
