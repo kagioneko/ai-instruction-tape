@@ -10,10 +10,16 @@ up a local GPU environment.
 
 ## Notebook
 
-Open:
+Open the baseline notebook:
 
 ```text
 experiments/0_5b_tape_compiler/colab_lora_0_5b.ipynb
+```
+
+For the mixed auxiliary-task run, open:
+
+```text
+experiments/0_5b_tape_compiler/colab_lora_0_5b_mixed.ipynb
 ```
 
 The notebook does four things:
@@ -36,11 +42,12 @@ config cell.
 
 ## Expected Runtime
 
-For the default settings:
+For the mixed notebook default settings:
 
-- train rows: 2,000
+- train rows: 2,400
 - eval rows: 200
 - epochs: 3
+- train mode: mixed full-AIT plus target/action auxiliary rows
 
 Expect a short exploratory run rather than a polished benchmark. The first goal
 is to see whether the model learns valid 4-character protocol emission.

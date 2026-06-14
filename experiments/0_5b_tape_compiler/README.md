@@ -32,6 +32,7 @@ That gives the model a tiny output space and lets evaluation be deterministic.
 - `human_eval_v1.jsonl` targets ambiguous target/action wording from the first run.
 - `COLAB.md` explains the Google Colab path.
 - `colab_lora_0_5b.ipynb` runs dataset generation, LoRA fine-tuning, and scoring.
+- `colab_lora_0_5b_mixed.ipynb` trains with target/action auxiliary rows.
 
 Generated datasets should go in `data/` and are ignored by git.
 
@@ -45,6 +46,12 @@ experiments/0_5b_tape_compiler/colab_lora_0_5b.ipynb
 
 See `COLAB.md` for the quickstart and score interpretation.
 
+For the target/action auxiliary-task run, open:
+
+```text
+experiments/0_5b_tape_compiler/colab_lora_0_5b_mixed.ipynb
+```
+
 ## Suggested First Run
 
 ```bash
@@ -52,6 +59,16 @@ set PYTHONPATH=src
 python experiments/0_5b_tape_compiler/generate_dataset.py --out experiments/0_5b_tape_compiler/data/train.jsonl --count 500
 python experiments/0_5b_tape_compiler/generate_dataset.py --out experiments/0_5b_tape_compiler/data/eval.jsonl --count 100 --seed 7
 ```
+
+To train with auxiliary target/action tasks:
+
+```bash
+set PYTHONPATH=src
+python experiments/0_5b_tape_compiler/generate_dataset.py --out experiments/0_5b_tape_compiler/data/train.jsonl --count 2400 --mode mixed
+python experiments/0_5b_tape_compiler/generate_dataset.py --out experiments/0_5b_tape_compiler/data/eval.jsonl --count 200 --seed 7 --mode ait
+```
+
+`mixed` emits roughly 70% full AIT rows, 15% target-only rows, and 15% action-only rows.
 
 Each JSONL row uses an instruction-tuning shape:
 

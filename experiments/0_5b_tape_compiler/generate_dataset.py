@@ -13,6 +13,12 @@ INSTRUCTION = (
     "Encode the natural-language instruction as AIT v0. "
     "Output only the 4-character code."
 )
+TARGET_INSTRUCTION = (
+    "Extract the AIT target id. Output only the one-character base36 target code."
+)
+ACTION_INSTRUCTION = (
+    "Classify the AIT action. Output only the one-character action code."
+)
 
 DOMAIN_PHRASES = {
     "security": ["security", "sec", "vulnerability", "attack surface"],
@@ -63,7 +69,7 @@ TEMPLATES = [
 ]
 
 
-def make_example(rng: random.Random) -> dict:
+def make_example(rng: random.Random, task: str = "ait") -> dict:
     dictionary = default_dictionary()
     domain = rng.choice(list(dictionary.domains.values()))
     action = rng.choice(list(dictionary.actions.values()))
@@ -80,12 +86,24 @@ def make_example(rng: random.Random) -> dict:
 
     ait = build_ait(domain=domain, action=action, target=target, priority=priority)
     eap = build_eap(domain=domain, action=action, target=target, priority=priority)
+    if task == "target":
+        instruction = TARGET_INSTRUCTION
+        output = ait[1]
+    elif task == "action":
+        instruction = ACTION_INSTRUCTION
+        output = ait[2]
+    else:
+        instruction = INSTRUCTION
+        output = ait
+
     return {
-        "instruction": INSTRUCTION,
+        "instruction": instruction,
         "input": natural,
-        "output": ait,
+        "output": output,
         "meta": {
             "eap": eap,
+            "ait": ait,
+            "task": task,
             "domain": domain,
             "action": action,
             "target": target,
@@ -99,6 +117,12 @@ def main() -> None:
     parser.add_argument("--out", required=True, help="Output JSONL path")
     parser.add_argument("--count", type=int, default=500)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--mode",
+        choices=["ait", "mixed"],
+        default="ait",
+        help="ait emits only full AIT rows; mixed adds target/action auxiliary rows.",
+    )
     args = parser.parse_args()
 
     rng = random.Random(args.seed)
@@ -106,7 +130,14 @@ def main() -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", encoding="utf-8") as f:
         for _ in range(args.count):
-            f.write(json.dumps(make_example(rng), ensure_ascii=False) + "\n")
+            task = "ait"
+            if args.mode == "mixed":
+                roll = rng.random()
+                if roll < 0.15:
+                    task = "target"
+                elif roll < 0.30:
+                    task = "action"
+            f.write(json.dumps(make_example(rng, task=task), ensure_ascii=False) + "\n")
 
 
 if __name__ == "__main__":
