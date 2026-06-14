@@ -33,6 +33,7 @@ That gives the model a tiny output space and lets evaluation be deterministic.
 - `COLAB.md` explains the Google Colab path.
 - `colab_lora_0_5b.ipynb` runs dataset generation, LoRA fine-tuning, and scoring.
 - `colab_lora_0_5b_mixed.ipynb` trains with target/action auxiliary rows.
+- `colab_lora_0_5b_curriculum.ipynb` trains mixed first, then full AIT only.
 
 Generated datasets should go in `data/` and are ignored by git.
 
@@ -50,6 +51,12 @@ For the target/action auxiliary-task run, open:
 
 ```text
 experiments/0_5b_tape_compiler/colab_lora_0_5b_mixed.ipynb
+```
+
+For the curriculum run that tries to avoid one-character output drift, open:
+
+```text
+experiments/0_5b_tape_compiler/colab_lora_0_5b_curriculum.ipynb
 ```
 
 ## Suggested First Run

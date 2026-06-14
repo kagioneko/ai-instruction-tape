@@ -22,6 +22,12 @@ For the mixed auxiliary-task run, open:
 experiments/0_5b_tape_compiler/colab_lora_0_5b_mixed.ipynb
 ```
 
+For the curriculum run, open:
+
+```text
+experiments/0_5b_tape_compiler/colab_lora_0_5b_curriculum.ipynb
+```
+
 The notebook does four things:
 
 1. Clones and installs `ai-instruction-tape`.
@@ -42,12 +48,14 @@ config cell.
 
 ## Expected Runtime
 
-For the mixed notebook default settings:
+For the curriculum notebook default settings:
 
-- train rows: 2,400
+- mixed train rows: 1,800
+- full-AIT train rows: 1,200
 - eval rows: 200
-- epochs: 3
-- train mode: mixed full-AIT plus target/action auxiliary rows
+- mixed epochs: 1
+- full-AIT epochs: 2
+- train mode: mixed warm-up, then full AIT cleanup
 
 Expect a short exploratory run rather than a polished benchmark. The first goal
 is to see whether the model learns valid 4-character protocol emission.
