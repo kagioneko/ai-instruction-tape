@@ -12,3 +12,4 @@ build/
 .claude/
 experiments/0_5b_tape_compiler/data/
 experiments/0_5b_tape_compiler/predictions*.txt
+experiments/0_5b_tape_compiler/ait-0_5b-lora/

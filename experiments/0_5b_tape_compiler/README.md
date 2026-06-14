@@ -28,8 +28,20 @@ That gives the model a tiny output space and lets evaluation be deterministic.
 - `generate_dataset.py` creates JSONL training/eval examples.
 - `evaluate_outputs.py` scores model outputs with the real AIT parser.
 - `sample_eval.jsonl` is a small hand-checkable eval set.
+- `COLAB.md` explains the Google Colab path.
+- `colab_lora_0_5b.ipynb` runs dataset generation, LoRA fine-tuning, and scoring.
 
 Generated datasets should go in `data/` and are ignored by git.
+
+## Google Colab
+
+For a GPU notebook run, open:
+
+```text
+experiments/0_5b_tape_compiler/colab_lora_0_5b.ipynb
+```
+
+See `COLAB.md` for the quickstart and score interpretation.
 
 ## Suggested First Run
 
@@ -93,4 +105,3 @@ assistant: s4x9
 ```
 
 Do not train it to explain AIT at first. Explanation increases output drift.
-
