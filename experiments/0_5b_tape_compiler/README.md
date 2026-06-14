@@ -27,6 +27,7 @@ That gives the model a tiny output space and lets evaluation be deterministic.
 
 - `generate_dataset.py` creates JSONL training/eval examples.
 - `evaluate_outputs.py` scores model outputs with the real AIT parser.
+- `analyze_errors.py` prints and exports exact-match failures.
 - `sample_eval.jsonl` is a small hand-checkable eval set.
 - `COLAB.md` explains the Google Colab path.
 - `colab_lora_0_5b.ipynb` runs dataset generation, LoRA fine-tuning, and scoring.
@@ -81,6 +82,13 @@ python experiments/0_5b_tape_compiler/evaluate_outputs.py --gold experiments/0_5
 ```
 
 `predictions.txt` should contain one model output per line.
+
+Analyze failures with:
+
+```bash
+set PYTHONPATH=src
+python experiments/0_5b_tape_compiler/analyze_errors.py --gold experiments/0_5b_tape_compiler/data/eval.jsonl --pred predictions.txt --out experiments/0_5b_tape_compiler/error_report.csv
+```
 
 ## Metrics
 
