@@ -29,6 +29,7 @@ That gives the model a tiny output space and lets evaluation be deterministic.
 - `evaluate_outputs.py` scores model outputs with the real AIT parser.
 - `analyze_errors.py` prints and exports exact-match failures.
 - `sample_eval.jsonl` is a small hand-checkable eval set.
+- `human_eval_v1.jsonl` targets ambiguous target/action wording from the first run.
 - `COLAB.md` explains the Google Colab path.
 - `colab_lora_0_5b.ipynb` runs dataset generation, LoRA fine-tuning, and scoring.
 
@@ -89,6 +90,14 @@ Analyze failures with:
 set PYTHONPATH=src
 python experiments/0_5b_tape_compiler/analyze_errors.py --gold experiments/0_5b_tape_compiler/data/eval.jsonl --pred predictions.txt --out experiments/0_5b_tape_compiler/error_report.csv
 ```
+
+For a stricter human-written check, score predictions against:
+
+```text
+experiments/0_5b_tape_compiler/human_eval_v1.jsonl
+```
+
+This set deliberately stresses target extraction and action boundaries.
 
 ## Metrics
 

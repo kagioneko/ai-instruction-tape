@@ -25,14 +25,14 @@ DOMAIN_PHRASES = {
 }
 
 ACTION_PHRASES = {
-    "xss": ["check xss", "scan for xss", "test xss", "find xss"],
-    "summarize": ["summarize", "make a summary", "compress", "brief"],
-    "fix": ["fix", "repair", "patch", "correct"],
-    "audit": ["audit", "review", "inspect", "check"],
-    "branch": ["branch", "split path", "make branch", "fork plan"],
-    "query": ["query", "look up", "search", "ask"],
-    "update": ["update", "refresh", "change", "rewrite"],
-    "validate": ["validate", "verify", "confirm", "test"],
+    "xss": ["check xss", "scan for xss", "test xss", "find xss", "probe xss", "xss scan"],
+    "summarize": ["summarize", "make a summary", "compress", "brief", "condense", "outline"],
+    "fix": ["fix", "repair", "patch", "correct", "resolve bug", "apply fix"],
+    "audit": ["audit", "review", "inspect", "check", "manual review", "read through"],
+    "branch": ["branch", "split path", "make branch", "fork plan", "create branch", "branch off"],
+    "query": ["query", "look up", "search", "ask", "retrieve", "find info"],
+    "update": ["update", "refresh", "change", "rewrite", "revise", "modify"],
+    "validate": ["validate", "verify", "confirm", "test", "check validity", "run validation"],
 }
 
 URGENCY = {
@@ -53,6 +53,13 @@ TEMPLATES = [
     "{urgency} please {action} {domain} item {target}",
     "context #{target}: {domain} {action} {urgency}",
     "take {domain} ctx {target} and {action} it {urgency}",
+    "{action} {domain} target {target} {urgency}",
+    "{domain} #{target} needs {action} {urgency}",
+    "{urgency} run {action} on {domain} ctx-{target}",
+    "{action} the {domain} entry numbered {target} {urgency}",
+    "{domain} slot {target}: {action} {urgency}",
+    "ログ{target}番の{domain}を{action} {urgency}",
+    "{target}番の{domain}コンテキストを{action} {urgency}",
 ]
 
 
@@ -104,4 +111,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

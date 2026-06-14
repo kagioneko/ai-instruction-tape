@@ -58,6 +58,13 @@ experiments/0_5b_tape_compiler/ait-0_5b-lora/
 
 `data/`, prediction files, and adapter outputs are ignored by git.
 
+The final notebook cell downloads:
+
+```text
+predictions_colab.txt
+eval.jsonl
+```
+
 ## Reading Scores
 
 The most important scores are:
@@ -71,4 +78,3 @@ Interpretation:
 - High valid, low exact: the protocol shape is learned; improve data diversity.
 - Low valid: reduce output drift, train longer, or make prompts stricter.
 - Low target only: add more context-number phrasing examples.
-
