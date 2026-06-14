@@ -10,3 +10,5 @@ build/
 .env
 .env.*
 .claude/
+experiments/0_5b_tape_compiler/data/
+experiments/0_5b_tape_compiler/predictions*.txt
