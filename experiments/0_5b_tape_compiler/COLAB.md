@@ -85,3 +85,7 @@ Interpretation:
 - High valid, low exact: the protocol shape is learned; improve data diversity.
 - Low valid: reduce output drift, train longer, or make prompts stricter.
 - Low target only: add more context-number phrasing examples.
+- If the mixed notebook emits one-character predictions on the full AIT eval,
+  make sure the notebook version includes the row `instruction` in the user
+  prompt. Mixed training needs the task label to distinguish full-code,
+  target-only, and action-only rows.
